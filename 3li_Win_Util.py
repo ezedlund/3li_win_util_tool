@@ -1,7 +1,9 @@
 import os, sys, ctypes
-from consolemenu import *
-from consolemenu.items import *
 from colorama import Fore, Style
+from pick import pick
+
+
+VERSION = "v1"
 
 
 def kill_process(process_name):
@@ -77,6 +79,7 @@ def assorted_games_killer(skip_continue_check=False):
         "UbisoftGameLauncher.exe",
         "UbisoftGameLauncher64.exe",
     ]
+    other_processes = ["Agent.exe"]
     riot_processes = ["RiotClientCrashHandler.exe", "RiotClientServices.exe"]
     try:
         # Oculus
@@ -95,6 +98,12 @@ def assorted_games_killer(skip_continue_check=False):
         print(Fore.GREEN + "RIOT PROCESSES" + Style.RESET_ALL)
         print(Fore.CYAN)  # INFO COLOR
         for process in riot_processes:
+            kill_process(process)
+        print(Style.RESET_ALL)  # INFO COLOR RESET
+        # Other
+        print(Fore.GREEN + "OTHER PROCESSES" + Style.RESET_ALL)
+        print(Fore.CYAN)  # INFO COLOR
+        for process in other_processes:
             kill_process(process)
         print(Style.RESET_ALL)  # INFO COLOR RESET
 
@@ -152,66 +161,71 @@ def commands_menu():
     commands_menu()
     * sub menu for commandss
     """
-    menu = ConsoleMenu(
-        f"{Fore.GREEN}-> Useful windows commands{Style.RESET_ALL}",
-        f"{Fore.LIGHTMAGENTA_EX}Welcome, {os.getlogin()}{Style.RESET_ALL}",
-    )
-    # create options
-    func_control_panel = FunctionItem(
-        "Open old school (and better) control panel",
-        lambda: os.system("control panel"),
-    )
-    func_ipconfig = FunctionItem(
-        "ipconfig (IP info)",
-        lambda: (
-            os.system("ipconfig"),
-            input(Fore.GREEN + "Press any key to continue..." + Style.RESET_ALL),
-        ),
-    )
-    func_sys_info = FunctionItem(
-        "System info",
-        lambda: (
-            os.system("systeminfo"),
-            input(Fore.GREEN + "Press any key to continue..." + Style.RESET_ALL),
-        ),
-    )
-    # add options
-    menu.append_item(func_control_panel)
-    menu.append_item(func_ipconfig)
-    menu.append_item(func_sys_info)
-    # show menu
-    menu.show()
+    while True:
+        os.system("cls")
+        menu_title = "Useful Commands"
+        options = ["Open old control panel", "IP config", "System infos", "Back"]
+        _, index = pick(options=options, title=menu_title, indicator=">")
+        if index == 0:
+            os.system("control panel")
+        elif index == 1:
+            os.system("ipconfig")
+            input(Fore.GREEN + "Press any key to continue..." + Style.RESET_ALL)
+        elif index == 2:
+            os.system("systeminfo")
+            input(Fore.GREEN + "Press any key to continue..." + Style.RESET_ALL)
+        elif index == 3:
+            break
 
 
 if __name__ == "__main__":
+    # Attempt to install requirements
+    os.system("pip install -r requirements.txt")
     # Check admin
     if ctypes.windll.shell32.IsUserAnAdmin():
-        # setup menu
-        menu = ConsoleMenu(
-            f"{Fore.GREEN}3li's Win Util Tool v0.4{Style.RESET_ALL}",
-            f"{Fore.LIGHTMAGENTA_EX}Welcome, {os.getlogin()}{Style.RESET_ALL}",
-        )
-        # create options
-        func_games_kill = FunctionItem(
-            "Random Games shit killer (Oculus, Ubisoft, etc.)",
-            lambda: assorted_games_killer(),
-        )
-        func_random_win = FunctionItem(
-            "Random windows shit killer", lambda: random_win_killer()
-        )
-        func_all = FunctionItem("All killers", lambda: all_killers())
-        func_see_tasks = FunctionItem("Check tasks", lambda: see_tasks())
-        func_pid_kill = FunctionItem("Custom PID task killer", lambda: pid_killer())
-        func_commands = FunctionItem("Useful commands", lambda: commands_menu())
-        # add options
-        menu.append_item(func_all)
-        menu.append_item(func_games_kill)
-        menu.append_item(func_random_win)
-        menu.append_item(func_see_tasks)
-        menu.append_item(func_pid_kill)
-        menu.append_item(func_commands)
-        # show menu
-        menu.show()
+        while True:
+            os.system("cls")
+            # Menu setup
+            menu_title = (
+                "|  3li's Win Util Tool "
+                + VERSION
+                + "    |\n      |   Welcome "
+                + str(os.getlogin())
+                + "   |"
+                + "\n____________________________________"
+            )
+            options = [
+                "All Cleaners",
+                "Assorted Games Cleaner",
+                "Windows Cleaner",
+                "See Tasks",
+                "Custom PID Cleaner",
+                "Useful Commands",
+                "Quit",
+            ]
+            _, index = pick(options=options, title=menu_title, indicator=">")
+            # All
+            if index == 0:
+                all_killers()
+            # Games
+            elif index == 1:
+                assorted_games_killer()
+            # Windows
+            elif index == 2:
+                random_win_killer()
+            # Tasks
+            elif index == 3:
+                see_tasks()
+            # PID Cleaner
+            elif index == 4:
+                pid_killer()
+            # Commands
+            elif index == 5:
+                commands_menu()
+            # Quit
+            elif index == 6:
+                break
+
     else:
         # re-launch as admin
         input(
