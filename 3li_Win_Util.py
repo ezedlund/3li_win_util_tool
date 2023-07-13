@@ -3,7 +3,7 @@ from colorama import Fore, Style
 from pick import pick
 
 
-VERSION = "v1"
+VERSION = "v1.1"
 
 
 def kill_process(process_name):
