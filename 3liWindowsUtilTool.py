@@ -31,7 +31,7 @@ except:
     """
 
 
-VERSION = "v2"
+VERSION = "v2.1"
 
 
 class MainGui(Tk):
@@ -194,10 +194,11 @@ class MainGui(Tk):
     def kill_process(self, process_name):
         """
         kill_process(self, process_name)
-        process_name -> name of process to kill ex: "Spotify.exe
+        process_name -> name of process to kill ex: "Spotify.exe"
         * use os.system to kill task provided
         """
         os.system(f"taskkill /f /im {process_name}")
+        self.update_status(f"Killed {process_name}...")
 
     def random_win_killer(self, using_all=False):
         """
@@ -318,6 +319,7 @@ class MainGui(Tk):
         """
         try:
             os.system("control panel")
+            self.update_status("Opened control panel... \N{heavy check mark}")
         except:
             pass
 
