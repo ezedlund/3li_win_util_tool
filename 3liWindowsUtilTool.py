@@ -31,7 +31,7 @@ except:
     """
 
 
-VERSION = "v2.1"
+VERSION = "v3"
 
 
 class MainGui(Tk):
@@ -75,7 +75,7 @@ class MainGui(Tk):
         # objects
         self.title = Label(
             self.root,
-            text=f"3li's Windows Util Tool {VERSION}",
+            text=f"Eli's Windows Util Tool {VERSION}",
         )
         self.welcome = Label(
             self.root,
@@ -147,10 +147,12 @@ class MainGui(Tk):
         """
         self.clear_gui()
         # other buttons
-        self.export_tasks_button.grid(row=2, column=0)
-        self.control_panel_button.grid(row=2, column=1)
-        self.kill_spotify_button.grid(row=3, column=0)
-        self.kill_discord_button.grid(row=3, column=1)
+        self.windows_button.grid(row=2, column=0)
+        self.games_button.grid(row=2, column=1)
+        self.export_tasks_button.grid(row=3, column=0)
+        self.control_panel_button.grid(row=3, column=1)
+        self.kill_spotify_button.grid(row=4, column=0)
+        self.kill_discord_button.grid(row=4, column=1)
         self.main_menu_button.grid(row=5, column=0, columnspan=2)
         self.status.grid(row=6, column=0, columnspan=2)
         self.update_status("Ready...")
@@ -183,8 +185,6 @@ class MainGui(Tk):
         self.title.grid(row=0, column=0, columnspan=2)
         self.welcome.grid(row=1, column=0, columnspan=2)
         self.all_button.grid(row=2, column=0, columnspan=2)
-        self.windows_button.grid(row=3, column=0)
-        self.games_button.grid(row=3, column=1)
         self.other_button.grid(row=4, column=0)
         self.quit_button.grid(row=4, column=1)
         self.status.configure(font=("Hobo Std", 10, "bold"))
@@ -266,6 +266,9 @@ class MainGui(Tk):
             "Battle.net.exe",
             "EpicWebHelper.exe",
             "EpicGamesLauncher.exe",
+            "BsgLauncher.exe",
+            "EADesktop.exe",
+            "EABackgroundService.exe",
         ]
         riot_processes = ["RiotClientCrashHandler.exe", "RiotClientServices.exe"]
         try:
