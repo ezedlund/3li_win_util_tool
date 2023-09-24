@@ -13,25 +13,17 @@
         
 Created by: Eli
 aka 3li
-7/2/2023
+07/02/2023
 https://github.com/ezedlund/Windows-Utility-Tool
 """
 
 
-try:
-    import os, sys, ctypes
-    from tkinter import *
-    from tkinter.ttk import *
+import os, sys, ctypes
+from tkinter import *
+from tkinter.ttk import *
 
-except:
-    pass
-    """
-        path = os.getcwd() + "\\requirements.txt"
-        os.system(f"pip install -r {path}")
-    """
-
-
-VERSION = "v3"
+VERSION = "v3.1"
+# released on 09/23/2023
 
 
 class MainGui(Tk):
@@ -43,11 +35,15 @@ class MainGui(Tk):
     def __init__(self):
         # init
         Tk.__init__(self)
-        self.geometry("320x320")
+        self.geometry("300x250")
         self.configure(bg="#222222")
         self.title("Eli's Windows Util Tool")
         self.root = Frame(self)
         self.root.pack()
+
+        # Toggles
+        self.spotify_toggle = BooleanVar()
+        self.discord_toggle = BooleanVar()
 
         # Style
         style = Style()
@@ -72,7 +68,13 @@ class MainGui(Tk):
             background="#222222",
             foreground="#f5f5f5",
         )
-        # objects
+        style.configure(
+            "TCheckbutton",
+            font=("Hobo Std", 10, "bold"),
+            background="#222222",
+            foreground="#f5f5f5",
+        )
+        # Objects #
         self.title = Label(
             self.root,
             text=f"Eli's Windows Util Tool {VERSION}",
@@ -84,21 +86,21 @@ class MainGui(Tk):
         self.status = Label(self.root, text="Ready...")
         self.all_button = Button(
             self.root,
-            text="Run windows and games cleaners",
+            text="Kill tasks!",
             command=lambda: self.all_killers(),
         )
         self.windows_button = Button(
             self.root,
-            text="Windows cleaner",
+            text="Kill windows tasks",
             command=lambda: self.random_win_killer(),
         )
         self.games_button = Button(
             self.root,
-            text="Games cleaner",
+            text="Kill game tasks",
             command=lambda: self.assorted_games_killer(),
         )
         self.other_button = Button(
-            self.root, text="Other commands", command=lambda: self.draw_other()
+            self.root, text="More options", command=lambda: self.draw_other()
         )
         self.quit_button = Button(
             self.root,
@@ -113,20 +115,29 @@ class MainGui(Tk):
         self.export_tasks_button = Button(
             self.root, text="Export tasks", command=lambda: self.export_tasks()
         )
-        self.kill_spotify_button = Button(
-            self.root,
-            text="Kill Spotify",
-            command=lambda: self.kill_process("Spotify.exe"),
-        )
-        self.kill_discord_button = Button(
-            self.root,
-            text="Kill Discord",
-            command=lambda: self.kill_process("Discord.exe"),
-        )
         self.control_panel_button = Button(
             self.root,
             text="Control panel",
             command=lambda: self.control_panel(),
+        )
+
+        # Spacer
+        self.spacer = Label(self.root, text="")
+
+        # Toggles
+        self.spotify_checkbox = Checkbutton(
+            self.root,
+            text="Kill Spotify",
+            variable=self.spotify_toggle,
+            onvalue=True,
+            offvalue=False,
+        )
+        self.discord_checkbox = Checkbutton(
+            self.root,
+            text="Kill Discord",
+            variable=self.discord_toggle,
+            onvalue=True,
+            offvalue=False,
         )
         # draw main menu gui
         self.draw_main()
@@ -147,14 +158,13 @@ class MainGui(Tk):
         """
         self.clear_gui()
         # other buttons
-        self.windows_button.grid(row=2, column=0)
-        self.games_button.grid(row=2, column=1)
-        self.export_tasks_button.grid(row=3, column=0)
-        self.control_panel_button.grid(row=3, column=1)
-        self.kill_spotify_button.grid(row=4, column=0)
-        self.kill_discord_button.grid(row=4, column=1)
-        self.main_menu_button.grid(row=5, column=0, columnspan=2)
-        self.status.grid(row=6, column=0, columnspan=2)
+        self.windows_button.grid(row=3, column=0, columnspan=2)
+        self.games_button.grid(row=4, column=0, columnspan=2)
+        self.export_tasks_button.grid(row=5, column=0, columnspan=2)
+        self.control_panel_button.grid(row=6, column=0, columnspan=2)
+        self.main_menu_button.grid(row=7, column=0, columnspan=2)
+        self.spacer.grid(row=8, column=0)
+        self.status.grid(row=9, column=0, columnspan=2)
         self.update_status("Ready...")
 
     def clear_gui(self):
@@ -170,8 +180,8 @@ class MainGui(Tk):
         self.other_button.grid_remove()
         self.main_menu_button.grid_remove()
         self.export_tasks_button.grid_remove()
-        self.kill_discord_button.grid_remove()
-        self.kill_spotify_button.grid_remove()
+        self.spotify_checkbox.grid_remove()
+        self.discord_checkbox.grid_remove()
         self.control_panel_button.grid_remove()
         self.update_status("")
         self.update()
@@ -182,13 +192,17 @@ class MainGui(Tk):
         * draw the main menu
         """
         self.clear_gui()
-        self.title.grid(row=0, column=0, columnspan=2)
-        self.welcome.grid(row=1, column=0, columnspan=2)
-        self.all_button.grid(row=2, column=0, columnspan=2)
-        self.other_button.grid(row=4, column=0)
-        self.quit_button.grid(row=4, column=1)
+        self.spacer.grid(row=0, column=0)
+        self.title.grid(row=1, column=0, columnspan=2)
+        self.welcome.grid(row=2, column=0, columnspan=2)
+        self.all_button.grid(row=3, column=0, columnspan=2)
+        self.other_button.grid(row=4, column=0, columnspan=2)
+        self.quit_button.grid(row=5, column=0, columnspan=2)
+        self.spotify_checkbox.grid(row=6, column=0, columnspan=2)
+        self.discord_checkbox.grid(row=7, column=0, columnspan=2)
         self.status.configure(font=("Hobo Std", 10, "bold"))
-        self.status.grid(row=5, column=0, columnspan=2)
+        self.spacer.grid(row=8, column=0)
+        self.status.grid(row=9, column=0, columnspan=2)
         self.update_status("Ready...")
 
     def kill_process(self, process_name):
@@ -235,6 +249,11 @@ class MainGui(Tk):
             # Xbox
             for process in xbox_processes:
                 self.kill_process(process)
+            # Spotify and/or Discord
+            if self.spotify_toggle.get():
+                self.kill_process("Spotify.exe")
+            if self.discord_toggle.get():
+                self.kill_process("Discord.exe")
         except Exception as e:
             self.update_status("An error occured...")
         finally:
