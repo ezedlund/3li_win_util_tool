@@ -5,7 +5,8 @@ Now utilizes an easy to use GUI with simple buttons.
 Requires [Python](https://www.python.org/downloads/)
 
 # Instructions
-1. Just run 3liWindowsUtilTool
+1. Download the latest release [here](https://github.com/ezedlund/Windows-Utility-Tool/releases)
+2. Just run 3liWindowsUtilTool
 
 
 # Credits
