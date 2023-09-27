@@ -5,13 +5,13 @@
    /  /:/\:\     /  /:/       \__\:\ 
   /  /::\ \:\   /  /:/        /  /::\
  /__/:/\:\ \:\ /__/:/      __/  /:/\/
- \  \:\ \:\_\/ \  \:\     /__/\/:/~~ 
+ \  \:\ \:\_\/ \  \:\     /__/\/:/
   \  \:\ \:\    \  \:\    \  \::/    
    \  \:\_\/     \  \:\    \  \:\    
     \  \:\        \  \:\    \__\/    
      \__\/         \__\/     
         
-Created by: Eli
+Created by: Eli/jah
 aka 3li
 07/02/2023
 https://github.com/ezedlund/Windows-Utility-Tool
@@ -22,8 +22,12 @@ import os, sys, ctypes
 from tkinter import *
 from tkinter.ttk import *
 
-VERSION = "v3.1"
-# released on 09/23/2023
+VERSION = "v3.2"
+# update made on 09/27/2023
+
+# Dev settiong to hide/show console
+# Leave it on True if you don't know what you're doing!
+HIDE_CONSOLE = True
 
 
 class MainGui(Tk):
@@ -44,6 +48,33 @@ class MainGui(Tk):
         # Toggles
         self.spotify_toggle = BooleanVar()
         self.discord_toggle = BooleanVar()
+        self.auto_close_toggle = BooleanVar()
+
+        # Create/Read options.txt
+        try:
+            if os.path.isfile(f"{os.getcwd()}\options.txt"):
+                options_txt = []
+                with open(f"{os.getcwd()}\options.txt", "r") as f:
+                    for line in f:
+                        line = line.replace("\n", "")
+                        options_txt.append(line)
+                if options_txt[0][len(options_txt[0]) - 4 :] == "True":
+                    self.spotify_toggle = BooleanVar(value=True)
+                if options_txt[1][len(options_txt[1]) - 4 :] == "True":
+                    self.discord_toggle = BooleanVar(value=True)
+                if options_txt[2][len(options_txt[2]) - 4 :] == "True":
+                    self.auto_close_toggle = BooleanVar(value=True)
+            else:
+                default_options = [
+                    "spotify_toggle: False",
+                    "discord_toggle: False",
+                    "auto_close_toggle: False",
+                ]
+                with open(f"{os.getcwd()}\options.txt", "w") as options_txt:
+                    options_txt.write("\n".join(default_options))
+            # options_txt = open("options.txt", "w")
+        except Exception as err:
+            print("Error with options.txt: " + str(err))
 
         # Style
         style = Style()
@@ -131,6 +162,7 @@ class MainGui(Tk):
             variable=self.spotify_toggle,
             onvalue=True,
             offvalue=False,
+            command=lambda: self.save_options(),
         )
         self.discord_checkbox = Checkbutton(
             self.root,
@@ -138,6 +170,15 @@ class MainGui(Tk):
             variable=self.discord_toggle,
             onvalue=True,
             offvalue=False,
+            command=lambda: self.save_options(),
+        )
+        self.auto_close_checkbox = Checkbutton(
+            self.root,
+            text="Close after clean",
+            variable=self.auto_close_toggle,
+            onvalue=True,
+            offvalue=False,
+            command=lambda: self.save_options(),
         )
         # draw main menu gui
         self.draw_main()
@@ -183,6 +224,7 @@ class MainGui(Tk):
         self.spotify_checkbox.grid_remove()
         self.discord_checkbox.grid_remove()
         self.control_panel_button.grid_remove()
+        self.auto_close_checkbox.grid_remove()
         self.update_status("")
         self.update()
 
@@ -200,9 +242,10 @@ class MainGui(Tk):
         self.quit_button.grid(row=5, column=0, columnspan=2)
         self.spotify_checkbox.grid(row=6, column=0, columnspan=2)
         self.discord_checkbox.grid(row=7, column=0, columnspan=2)
+        self.auto_close_checkbox.grid(row=8, column=0, columnspan=2)
         self.status.configure(font=("Hobo Std", 10, "bold"))
-        self.spacer.grid(row=8, column=0)
-        self.status.grid(row=9, column=0, columnspan=2)
+        self.spacer.grid(row=9, column=0)
+        self.status.grid(row=10, column=0, columnspan=2)
         self.update_status("Ready...")
 
     def kill_process(self, process_name):
@@ -241,6 +284,7 @@ class MainGui(Tk):
             "gamingservicesnet.exe",
             "gameinputsvc.exe",
             "mysqld.exe",
+            "XboxPcAppFT.exe",
         ]
         try:
             # Windows
@@ -254,7 +298,8 @@ class MainGui(Tk):
                 self.kill_process("Spotify.exe")
             if self.discord_toggle.get():
                 self.kill_process("Discord.exe")
-        except Exception as e:
+        except Exception as err:
+            print(err)
             self.update_status("An error occured...")
         finally:
             if not using_all:
@@ -303,7 +348,8 @@ class MainGui(Tk):
             # Other
             for process in other_processes:
                 self.kill_process(process)
-        except Exception as e:
+        except Exception as err:
+            print(err)
             self.update_status("An error occured...")
         finally:
             if not using_all:
@@ -318,6 +364,9 @@ class MainGui(Tk):
         self.assorted_games_killer(True)
         self.random_win_killer(True)
         self.update_status("Finished cleaning all... \N{heavy check mark}")
+        if self.auto_close_toggle.get() == True:
+            self.update_status("Thanks!")
+            quit()
 
     def export_tasks(self):
         """
@@ -331,8 +380,9 @@ class MainGui(Tk):
                     f.write(line)
             os.startfile(path)
             self.update_status("Tasks exported... \N{heavy check mark}")
-        except Exception as e:
-            self.update_status("Error!")
+        except Exception as err:
+            print(err)
+            self.update_status("An error occured...")
 
     def control_panel(self):
         """
@@ -342,18 +392,49 @@ class MainGui(Tk):
         try:
             os.system("control panel")
             self.update_status("Opened control panel... \N{heavy check mark}")
-        except:
-            pass
+        except Exception as err:
+            print(err)
+            self.update_status("An error occured...")
+
+    def save_options(self):
+        """
+        save_options(self)
+        * save options to txt
+        """
+        try:
+            # check if file exists
+            if os.path.isfile(f"{os.getcwd()}\options.txt"):
+                # write current options
+                options_txt = [
+                    f"spotify_toggle: {self.spotify_toggle.get()}",
+                    f"discord_toggle: {self.discord_toggle.get()}",
+                    f"auto_close_toggle: {self.auto_close_toggle.get()}",
+                ]
+                with open(f"{os.getcwd()}\options.txt", "w") as f:
+                    f.write("\n".join(options_txt))
+            # file doesnt exist
+            else:
+                default_options = [
+                    "spotify_toggle: False",
+                    "discord_toggle: False",
+                    "auto_close_toggle: False",
+                ]
+                with open(f"{os.getcwd()}\options.txt", "w") as options_txt:
+                    options_txt.write("\n".join(default_options))
+        except Exception as err:
+            print(err)
+            self.update_status("An error occured...")
 
 
 if __name__ == "__main__":
     # Check admin
     if ctypes.windll.shell32.IsUserAnAdmin():
         # hide console
-        kernel32 = ctypes.WinDLL("kernel32")
-        user32 = ctypes.WinDLL("user32")
-        hWnd = kernel32.GetConsoleWindow()
-        user32.ShowWindow(hWnd, 0)
+        if HIDE_CONSOLE:
+            kernel32 = ctypes.WinDLL("kernel32")
+            user32 = ctypes.WinDLL("user32")
+            hWnd = kernel32.GetConsoleWindow()
+            user32.ShowWindow(hWnd, 0)
         # launch GUI
         app = MainGui()
         app.mainloop()
