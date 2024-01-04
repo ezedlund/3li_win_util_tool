@@ -1,3 +1,12 @@
+
+# This program was replaced by my [newest project](https://github.com/ezedlund/ElisUtilBox/tree/main)
+# This will no longer be updated
+# I suggest you switch however, I will not delete this.
+~
+~
+~
+
+
 # Windows-Utility-Tool
 Simple windows utility tool made in python.
 Now utilizes an easy to use GUI with simple buttons.
